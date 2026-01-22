@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  tbomb:
+    build: .
+    container_name: tbomb-app
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - DATABASE_PATH=/app/data/tbomb.db
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    
+  tbomb-health-checker:
+    build: .
+    container_name: tbomb-health-checker
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - DATABASE_PATH=/app/data/tbomb.db
+    command: python health_monitor.py
+    restart: unless-stopped
+    depends_on:
+      - tbomb
+
+volumes:
+  data:
+  logs:
